@@ -28,13 +28,16 @@ class LeafNode(HTMLNode):
 
     def to_html(self):
         if self.value == None:
-            raise ValueError("No value provided")
+            raise ValueError(f"No value provided: {self.tag} {self.props} ")
         new_string = ""
         if self.tag == None:
             new_string = self.value
         else:
             prop_string = self.props_to_html()
-            new_string = f"<{self.tag}{prop_string}>{self.value}</{self.tag}>"
+            if self.tag != "img":
+                new_string = f"<{self.tag}{prop_string}>{self.value}</{self.tag}>"
+            else:
+                new_string = f"<{self.tag}{prop_string}></{self.tag}>"
         return new_string
     
 class ParentNode(HTMLNode):

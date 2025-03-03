@@ -90,6 +90,7 @@ def markdown_to_html_node(markdown):
     is_a_parent = False
     for block in blocks:
         block_type = block_to_block_type(block)
+        #print(f"This {block}")
         match block_type:
             case BlockType.HEADING:
                 html_node = which_heading(block)
@@ -114,8 +115,10 @@ def markdown_to_html_node(markdown):
                 children = make_list_items(list_items)
                 block_parent = ParentNode("ol", children)
             case _:
+                #print(f"{block}")
                 is_a_parent = True
                 nodes = text_to_textnodes(block)
+                #print(f"{nodes}")
                 html_nodes = make_children_nodes(nodes)
                 block_parent = ParentNode("p",html_nodes)
         if is_a_parent == True:
@@ -124,3 +127,9 @@ def markdown_to_html_node(markdown):
             result.append(html_node)
     div_parent = ParentNode("div", result)
     return div_parent
+
+def extract_title(markdown):
+    lines = markdown.split('\n')
+    for line in lines:
+        if "# " == line[:2]:
+            return line[2:]

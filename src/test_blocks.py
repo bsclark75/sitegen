@@ -141,3 +141,19 @@ the **same** even with inline stuff
             html,
             "<div><pre><code> This is text that _should_ remain the **same** even with inline stuff </code></pre></div>",
         )
+    def test_extract_title(self):
+        md = """
+# This is a headings 1
+
+## This is a headings 2
+
+### This is a headings 3
+
+#### This is a headings 4
+
+##### This is a headings 5
+
+###### This is a headings 6
+"""
+        text = extract_title(md)
+        self.assertEqual("This is a headings 1", text)

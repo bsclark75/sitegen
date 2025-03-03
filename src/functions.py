@@ -15,7 +15,7 @@ def text_node_to_html_node(textnode):
 		case TextType.LINKS:
 			return LeafNode(textnode.text, "a", {'href': textnode.url })
 		case TextType.IMAGES:
-			return LeafNode(None, "img", {'src':textnode.url, 'alt':textnode.text})
+			return LeafNode(textnode.text, "img", {'src':textnode.url, 'alt':textnode.text})
 		case _:
 			raise ValueError("Unexpected text node")
 		
@@ -85,9 +85,10 @@ def split_nodes_link(nodes):
     return result
 
 def split_nodes_image(nodes):
+    #print("start node image")
     result = []
     # Updated regex pattern to match image markdown: ![alt_text](url)
-    image_pattern = re.compile(r'!\[([^\]]+)\]\((https?://[^\)]+)\)')
+    image_pattern = re.compile(r'!\[([^\]]+)\]\(((?!https?://)[^\)]+)\)')
 
     for node in nodes:
         text = node.text
@@ -95,6 +96,7 @@ def split_nodes_image(nodes):
         
         # If no image pattern matches, skip this node
         if not image_pattern.search(text):
+            #print("Pattern not found")
             result.append(node)
             continue
 
@@ -118,10 +120,11 @@ def split_nodes_image(nodes):
 
 
 def text_to_textnodes(text):
-	new_nodes = split_nodes_delimiter(text,None,TextType.NORMAL)
-	new_nodes = split_nodes_delimiter(new_nodes,'**', TextType.BOLD)
-	new_nodes = split_nodes_delimiter(new_nodes, '_', TextType.ITALIC)
-	new_nodes = split_nodes_delimiter(new_nodes, '`', TextType.CODE)
-	new_nodes = split_nodes_image(new_nodes)
-	new_nodes = split_nodes_link(new_nodes)
-	return new_nodes
+      new_nodes = split_nodes_delimiter(text,None,TextType.NORMAL)
+      new_nodes = split_nodes_delimiter(new_nodes,'**', TextType.BOLD)
+      new_nodes = split_nodes_delimiter(new_nodes, '_', TextType.ITALIC)
+      new_nodes = split_nodes_delimiter(new_nodes, '`', TextType.CODE)
+      new_nodes = split_nodes_image(new_nodes)
+      #print(new_nodes)
+      new_nodes = split_nodes_link(new_nodes)
+      return new_nodes
