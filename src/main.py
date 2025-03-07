@@ -1,6 +1,7 @@
 from blocks import markdown_to_html_node, extract_title
 import os
 import shutil
+import sys
 
 def delete_directory_contents(dest_dir):
     """Deletes all contents of the destination directory."""
@@ -44,7 +45,7 @@ def clean_and_copy(src_dir, dest_dir):
     print(f"Copying from {src_dir} to {dest_dir}")
     copy_directory_contents(src_dir, dest_dir)
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, base_path="/"):
     if os.path.isdir(from_path):
         if not os.path.exists(dest_path):
             os.makedirs(dest_path)
@@ -54,13 +55,13 @@ def generate_page(from_path, template_path, dest_path):
             dest_full_path = os.path.join(dest_path, entry)
             if os.path.isdir(full_path):
             # Recursive call to process subdirectories
-                generate_page(full_path, template_path, dest_full_path)
+                generate_page(full_path, template_path, dest_full_path, base_path)
             else:
-                process_markdown_file(full_path, template_path, dest_full_path)
+                process_markdown_file(full_path, template_path, dest_full_path, base_path)
     else:
         process_markdown_file(from_path, template_path, dest_path)
 
-def process_markdown_file(from_file, templatefile, dest_file):
+def process_markdown_file(from_file, templatefile, dest_file, base_path="/"):
     filename,ext = dest_file.split(".")
     dest_file = filename + ".html"
     print(f"Generating page from {from_file} to {dest_file} using {templatefile}")
@@ -74,14 +75,17 @@ def process_markdown_file(from_file, templatefile, dest_file):
     title = extract_title(markdown)
     html = template.replace("{{ Title }}", title)
     html = html.replace("{{ Content }}", content)
+    html = html.replace('href="/', 'href="{BASEPATH}')
+    html = html.replace('src="/', 'src="{BASEPATH}')
     with open(dest_file, "w") as destination_file:
          destination_file.write(html)
 
 def main():
+      basepath = sys.argv[1]
       src_directory = 'static'
-      dest_directory = 'public'
+      dest_directory = 'docs'
       clean_and_copy(src_directory, dest_directory)
-      generate_page("content", "template.html", "public")
+      generate_page("content", "template.html", "docs", basepath)
 
 if __name__ == "__main__":
 	main()
