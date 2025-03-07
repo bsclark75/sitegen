@@ -45,10 +45,28 @@ def clean_and_copy(src_dir, dest_dir):
     copy_directory_contents(src_dir, dest_dir)
 
 def generate_page(from_path, template_path, dest_path):
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
-    with open(from_path) as markdown_file:
+    if os.path.isdir(from_path):
+        if not os.path.exists(dest_path):
+            os.makedirs(dest_path)
+        print(f"Entering directory: {from_path}")
+        for entry in os.listdir(from_path):
+            full_path = os.path.join(from_path, entry)
+            dest_full_path = os.path.join(dest_path, entry)
+            if os.path.isdir(full_path):
+            # Recursive call to process subdirectories
+                generate_page(full_path, template_path, dest_full_path)
+            else:
+                process_markdown_file(full_path, template_path, dest_full_path)
+    else:
+        process_markdown_file(from_path, template_path, dest_path)
+
+def process_markdown_file(from_file, templatefile, dest_file):
+    filename,ext = dest_file.split(".")
+    dest_file = filename + ".html"
+    print(f"Generating page from {from_file} to {dest_file} using {templatefile}")
+    with open(from_file) as markdown_file:
         markdown = markdown_file.read()
-    with open(template_path) as template_file:
+    with open(templatefile) as template_file:
         template = template_file.read()
     html_nodes = markdown_to_html_node(markdown)
     #print(html_nodes)
@@ -56,14 +74,14 @@ def generate_page(from_path, template_path, dest_path):
     title = extract_title(markdown)
     html = template.replace("{{ Title }}", title)
     html = html.replace("{{ Content }}", content)
-    with open(dest_path, "w") as destination_file:
+    with open(dest_file, "w") as destination_file:
          destination_file.write(html)
 
 def main():
       src_directory = 'static'
       dest_directory = 'public'
       clean_and_copy(src_directory, dest_directory)
-      generate_page("content/index.md", "template.html", "public/index.html")
+      generate_page("content", "template.html", "public")
 
 if __name__ == "__main__":
 	main()
