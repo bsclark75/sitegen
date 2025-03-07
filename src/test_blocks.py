@@ -16,7 +16,7 @@ This is a paragraph of text. It has some **bold** and _italic_ words inside of i
             [
                 "# This is a heading",
                 "This is a paragraph of text. It has some **bold** and _italic_ words inside of it.",
-                "- This is the first list item in a list block - This is a list item - This is another list item",
+                "- This is the first list item in a list block\n- This is a list item\n- This is another list item",
             ],
             blocks,
         )
@@ -68,7 +68,7 @@ This is another paragraph with _italic_ text and `code` here
         html = node.to_html()
         self.assertEqual(
         html,
-        "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
+        "<div><p>This is <b>bolded</b> paragraph\ntext in a p\ntag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
     )
 
     def test_headings(self):
@@ -124,7 +124,7 @@ This is another paragraph with _italic_ text and `code` here
         #print(html)
         self.assertEqual(
         html,
-        "<div><ol><li>This is the first list item in a list block </li><li>This is a list item </li><li>This is another list item</li></ol></div>",
+        "<div><ol><li>This is the first list item in a list block\n</li><li>This is a list item\n</li><li>This is another list item</li></ol></div>",
     )
 
     def test_codeblock(self):
@@ -139,7 +139,7 @@ the **same** even with inline stuff
         html = node.to_html()
         self.assertEqual(
             html,
-            "<div><pre><code> This is text that _should_ remain the **same** even with inline stuff </code></pre></div>",
+            "<div><pre><code>\nThis is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
         )
     def test_extract_title(self):
         md = """

@@ -39,7 +39,7 @@ class TestFunctions(unittest.TestCase):
         node = TextNode("This is a image node", TextType.IMAGES, "image.jpg")
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, "img")
-        self.assertEqual(html_node.value, None)
+        self.assertEqual(html_node.value, "This is a image node")
         self.assertEqual(html_node.props, {"src":"image.jpg", "alt": "This is a image node"})
                          
     def test_fake(self):

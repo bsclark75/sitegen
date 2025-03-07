@@ -22,7 +22,7 @@ def text_node_to_html_node(textnode):
 		
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
-    print(f"OLD NODES: {old_nodes}, DELIMITER: {delimiter}, TEXT_TYPE: {text_type}")
+    #print(f"OLD NODES: {old_nodes}, DELIMITER: {delimiter}, TEXT_TYPE: {text_type}")
     if isinstance(old_nodes, str):
         old_nodes = [TextNode(old_nodes, TextType.NORMAL)]
         
@@ -65,7 +65,7 @@ def extract_markdown_links(text):
 
 def split_nodes_link(nodes):
     result = []
-    link_pattern = re.compile(r'\[([^\]]+)\]\((https?://[^\)]+)\)')
+    link_pattern = re.compile(r'\[(.*?)\]\((https?:\/\/[^\s)]+|\/?[^\s)]+)\)')
 
     for node in nodes:
         text = node.text
@@ -89,7 +89,7 @@ def split_nodes_image(nodes):
     #print("start node image")
     result = []
     # Updated regex pattern to match image markdown: ![alt_text](url)
-    image_pattern = re.compile(r'!\[([^\]]+)\]\(((?!https?://)[^\)]+)\)')
+    image_pattern = re.compile(r'!\[(.*?)\]\((https?:\/\/[^\s)]+|\/?[^\s)]+)\)')
 
     for node in nodes:
         text = node.text
