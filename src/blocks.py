@@ -50,22 +50,22 @@ def replace_markdown(markdown, text):
 
 def which_heading(block):
     if "######" in block:
-        text = replace_markdown(block, "######")
+        text = replace_markdown(block, "###### ")
         tag = "h6"
     elif "#####" in block:
-        text = replace_markdown(block, "#####")
+        text = replace_markdown(block, "##### ")
         tag = "h5"
     elif "####" in block:
-        text = replace_markdown(block, "####")
+        text = replace_markdown(block, "#### ")
         tag = "h4"
     elif "###" in block:
-        text = replace_markdown(block, "###")
+        text = replace_markdown(block, "### ")
         tag = "h3"
     elif "##" in block:
-        text = replace_markdown(block, "##")
+        text = replace_markdown(block, "## ")
         tag = "h2"
     else:
-        text = replace_markdown(block, "#")
+        text = replace_markdown(block, "# ")
         tag = "h1"
     return text,tag
 
@@ -73,7 +73,7 @@ def make_list_items(items):
     results = []
     for item in items:
         if item != "":
-            results.append(block_to_parent(item, "li"))
+            results.append(block_to_parent(item.strip("\n"), "li"))
     return results
 
 def remove_number_and_period(string):
@@ -103,10 +103,10 @@ def markdown_to_html_node(markdown):
                 html_node = LeafNode(text, "code")
                 block_parent = ParentNode("pre", [html_node])
             case BlockType.QUOTE:
-                text = replace_markdown(block, ">")
+                text = replace_markdown(block, "> ")
                 block_parent = block_to_parent(text, "blockquote")
             case BlockType.UNORDERED_LIST:
-                text = replace_markdown(block, '-')
+                text = replace_markdown(block, '- ')
                 html_nodes = make_list_items(text.split("\n"))
                 block_parent = ParentNode("ul", html_nodes)
             case BlockType.ORDERED_LIST:
