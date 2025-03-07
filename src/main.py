@@ -59,7 +59,7 @@ def generate_page(from_path, template_path, dest_path, base_path="/"):
             else:
                 process_markdown_file(full_path, template_path, dest_full_path, base_path)
     else:
-        process_markdown_file(from_path, template_path, dest_path)
+        process_markdown_file(from_path, template_path, dest_path, base_path)
 
 def process_markdown_file(from_file, templatefile, dest_file, base_path="/"):
     filename,ext = dest_file.split(".")
@@ -75,8 +75,8 @@ def process_markdown_file(from_file, templatefile, dest_file, base_path="/"):
     title = extract_title(markdown)
     html = template.replace("{{ Title }}", title)
     html = html.replace("{{ Content }}", content)
-    html = html.replace('href="/', 'href="{BASEPATH}')
-    html = html.replace('src="/', 'src="{BASEPATH}')
+    html = html.replace('href="/', f'href="/{base_path}')
+    html = html.replace('src="/', f'src="/{base_path}')
     with open(dest_file, "w") as destination_file:
          destination_file.write(html)
 
