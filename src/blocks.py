@@ -18,7 +18,7 @@ def markdown_to_blocks(markdown):
         if block == "":
             continue
         block = block.strip('\n')
-        block = block.replace('\n', ' ')
+        #block = block.replace('\n', ' ')
         #print(block)
         blocks_out.append(block)
     #print(blocks_out)
@@ -38,14 +38,11 @@ def block_to_block_type(block):
     else:
         return BlockType.PARAGRAPH
 
-def make_children_nodes(nodes, tag=None):
+def make_children_nodes(nodes):
+    #print(f"NODES: {nodes}")
     html_nodes = []
-    if tag == None:
-        for node in nodes:
-            html_nodes.append(text_node_to_html_node(node))
-    else:
-        for node in nodes:
-            html_nodes.append(LeafNode(node.text, tag))
+    for node in nodes:
+        html_nodes.append(text_node_to_html_node(node))
     return html_nodes
 
 def replace_markdown(markdown, text):
@@ -54,77 +51,70 @@ def replace_markdown(markdown, text):
 def which_heading(block):
     if "######" in block:
         text = replace_markdown(block, "######")
-        html_node = LeafNode(text, "h6")
+        tag = "h6"
     elif "#####" in block:
         text = replace_markdown(block, "#####")
-        html_node = LeafNode(text, "h5")
+        tag = "h5"
     elif "####" in block:
         text = replace_markdown(block, "####")
-        html_node = LeafNode(text, "h4")
+        tag = "h4"
     elif "###" in block:
         text = replace_markdown(block, "###")
-        html_node = LeafNode(text, "h3")
+        tag = "h3"
     elif "##" in block:
         text = replace_markdown(block, "##")
-        html_node = LeafNode(text, "h2")
+        tag = "h2"
     else:
         text = replace_markdown(block, "#")
-        html_node = LeafNode(text, "h1")
-    return html_node
+        tag = "h1"
+    return text,tag
 
 def make_list_items(items):
-    result = []
+    results = []
     for item in items:
         if item != "":
-            result.append(LeafNode(item, "li"))
-    return result
+            results.append(block_to_parent(item, "li"))
+    return results
 
 def remove_number_and_period(string):
     list_items = re.findall(r'\d+\.\s*[^0-9]+', string)
     cleaned_list_items = [re.sub(r'^\d+\.\s*', '', item) for item in list_items]
-    return cleaned_list_items
+    html_nodes = make_list_items(cleaned_list_items)
+    return html_nodes
+
+def block_to_parent(block,tag):
+    nodes = text_to_textnodes(block)
+    html_nodes = make_children_nodes(nodes)
+    block_parent = ParentNode(tag,html_nodes)
+    return block_parent
 
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
     result = []
-    is_a_parent = False
     for block in blocks:
         block_type = block_to_block_type(block)
         #print(f"This {block}")
         match block_type:
             case BlockType.HEADING:
-                html_node = which_heading(block)
+                text,tag = which_heading(block)
+                block_parent = block_to_parent(text, tag)
             case BlockType.CODE:
-                is_a_parent = True
                 text = replace_markdown(block, "```")
                 html_node = LeafNode(text, "code")
                 block_parent = ParentNode("pre", [html_node])
             case BlockType.QUOTE:
                 text = replace_markdown(block, ">")
-                html_node = LeafNode(text, "blockquote")
+                block_parent = block_to_parent(text, "blockquote")
             case BlockType.UNORDERED_LIST:
-                is_a_parent = True
-                list_items = block.split('-')
-                #print(list_items)
-                children = make_list_items(list_items)
-                #print(children)
-                block_parent = ParentNode("ul", children)
+                text = replace_markdown(block, '-')
+                html_nodes = make_list_items(text.split("\n"))
+                block_parent = ParentNode("ul", html_nodes)
             case BlockType.ORDERED_LIST:
-                is_a_parent = True
-                list_items = remove_number_and_period(block)
-                children = make_list_items(list_items)
-                block_parent = ParentNode("ol", children)
+                html_nodes = remove_number_and_period(block)
+                block_parent = ParentNode("ol", html_nodes)
             case _:
-                #print(f"{block}")
-                is_a_parent = True
-                nodes = text_to_textnodes(block)
-                #print(f"{nodes}")
-                html_nodes = make_children_nodes(nodes)
-                block_parent = ParentNode("p",html_nodes)
-        if is_a_parent == True:
-            result.append(block_parent)
-        else:
-            result.append(html_node)
+                block_parent = block_to_parent(block, "p")
+        result.append(block_parent)
     div_parent = ParentNode("div", result)
     return div_parent
 
