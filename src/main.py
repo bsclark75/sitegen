@@ -77,7 +77,7 @@ def process_markdown_file(from_file, templatefile, dest_file, base_path="/"):
     html = html.replace("{{ Content }}", content)
     html = html.replace("href='/", f'href=\'{base_path}')
     html = html.replace("src='/", f'src=\'{base_path}')
-    print(html)
+    #print(html)
     with open(dest_file, "w") as destination_file:
          destination_file.write(html)
 
